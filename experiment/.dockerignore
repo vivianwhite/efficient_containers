@@ -1,0 +1,15 @@
+# Python virtual environment
+.venv/
+
+# Git
+.git
+.gitignore
+
+# Data & outputs
+data/
+outputs/
+results/
+
+# Python cache
+__pycache__/
+*.pyc
