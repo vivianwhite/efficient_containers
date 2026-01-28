@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import resnet50
+from torchvision.models import resnet18
 
 
 def parse_args():
@@ -58,7 +58,7 @@ def main():
     )
 
     # Model
-    model = resnet50(num_classes=10)
+    model = resnet18(num_classes=10)
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()

@@ -12,4 +12,9 @@ results/
 
 # Python cache
 __pycache__/
+
+# Other
 *.pyc
+*.pt
+*.pth
+
