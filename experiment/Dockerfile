@@ -14,5 +14,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 6. Default command to run the experiment
-CMD ["python", "train.py"]
+ENTRYPOINT ["python", "train.py"]
 
