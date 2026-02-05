@@ -7,6 +7,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torchvision.models import resnet18
+from codecarbon import track_emissions
 
 
 def parse_args():
@@ -23,7 +24,38 @@ def parse_args():
                         help="DataLoader worker processes")
     return parser.parse_args()
 
+@track_emissions(
+        save_to_api=True,
+        log_level=WARNING,
+        output_dir = /app/experiment
+        )
+def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
+    start_time = time.time()
+    for epoch in range(epochs):
+        model.train()
+        running_loss = 0.0
+
+        for inputs, targets in trainloader:
+            inputs, targets = inputs.to(device), targets.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+        scheduler.step()
+
+        avg_loss = running_loss / len(trainloader)
+        print(f"Epoch [{epoch+1}/{epochs}] - Loss: {avg_loss:.4f}")
+
+    total_time = time.time() - start_time
+    print(f"Training completed in {total_time:.2f} seconds")
+
 def main():
+
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -67,31 +99,8 @@ def main():
     )
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
 
-    # Training loop
-    start_time = time.time()
-
-    for epoch in range(args.epochs):
-        model.train()
-        running_loss = 0.0
-
-        for inputs, targets in trainloader:
-            inputs, targets = inputs.to(device), targets.to(device)
-
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item()
-
-        scheduler.step()
-
-        avg_loss = running_loss / len(trainloader)
-        print(f"Epoch [{epoch+1}/{args.epochs}] - Loss: {avg_loss:.4f}")
-
-    total_time = time.time() - start_time
-    print(f"Training completed in {total_time:.2f} seconds")
+    # Training
+    train(model, trainloader, criterion, optimizer, scheduler, args.epochs, device)
 
     # Evaluation
     model.eval()
@@ -109,9 +118,9 @@ def main():
     acc = 100.0 * correct / total
     print(f"Test accuracy: {acc:.2f}%")
 
-    # Save model
-    os.makedirs("outputs", exist_ok=True)
-    torch.save(model.state_dict(), "outputs/resnet50_cifar10.pt")
+#    # Save model
+#    os.makedirs("outputs", exist_ok=True)
+#    torch.save(model.state_dict(), "outputs/resnet50_cifar10.pt")
 
 
 if __name__ == "__main__":
