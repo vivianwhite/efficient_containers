@@ -1,7 +1,20 @@
-.venv
-__pycache__
+# Python virtual environment
+.venv/
+
+# Git
 .git
+.gitignore
+
+# Data & outputs
+data/
+outputs/
+results/
+
+# Python cache
+__pycache__/
+
+# Other
+*.pyc
 *.pt
 *.pth
-data
 
