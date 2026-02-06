@@ -26,8 +26,8 @@ def parse_args():
 
 @track_emissions(
         save_to_api=True,
-        log_level=WARNING,
-        output_dir = /app/experiment
+        log_level="WARNING",
+        output_dir="/app/experiment"
         )
 def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
     start_time = time.time()
@@ -118,9 +118,9 @@ def main():
     acc = 100.0 * correct / total
     print(f"Test accuracy: {acc:.2f}%")
 
-#    # Save model
-#    os.makedirs("outputs", exist_ok=True)
-#    torch.save(model.state_dict(), "outputs/resnet50_cifar10.pt")
+    # Save model
+    #os.makedirs("/app/experiment/models", exist_ok=True)
+    torch.save(model.state_dict(), "/app/experiment/resnet50_cifar10.pt")
 
 
 if __name__ == "__main__":
