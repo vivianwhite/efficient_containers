@@ -9,6 +9,8 @@ import torchvision.transforms as transforms
 from torchvision.models import resnet18
 from codecarbon import track_emissions
 
+api_key = os.environ.get("CODECARBON_API_TOKEN")
+experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -27,10 +29,13 @@ def parse_args():
 output_dir = "/app/resnet50-cifar10/emissions"
 os.makedirs(output_dir, exist_ok=True)
 @track_emissions(
+        api_endpoint="https://api.codecarbon.io",
+        api_key=api_key,
+        experiment_id=experiment_id,
         save_to_api=True,
         log_level="WARNING",
-        output_dir="/app/resnet50-cifar10/emissions"
-
+        output_dir="/app/resnet50-cifar10/emissions",
+        country_iso_code="CAN"
         )
 def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
     start_time = time.time()
