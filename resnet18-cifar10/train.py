@@ -14,7 +14,7 @@ experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Train ResNet-50 on CIFAR-10"
+        description="Train ResNet-18 on CIFAR-10"
     )
     parser.add_argument("--batch-size", type=int, default=128,
                         help="Batch size for training")
@@ -26,7 +26,7 @@ def parse_args():
                         help="DataLoader worker processes")
     return parser.parse_args()
 
-output_dir = "/app/resnet50-cifar10/emissions"
+output_dir = "/app/resnet18-cifar10/emissions"
 os.makedirs(output_dir, exist_ok=True)
 @track_emissions(
         api_endpoint="https://api.codecarbon.io",
@@ -34,7 +34,7 @@ os.makedirs(output_dir, exist_ok=True)
         experiment_id=experiment_id,
         save_to_api=True,
         log_level="WARNING",
-        output_dir="/app/resnet50-cifar10/emissions",
+        output_dir="/app/resnet18-cifar10/emissions",
         country_iso_code="CAN"
         )
 def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
@@ -129,7 +129,7 @@ def main():
     print(f"Test accuracy: {acc:.2f}%")
 
     # Save model
-    torch.save(model.state_dict(), f"{model_dir}/resnet50_cifar10.pt")
+    torch.save(model.state_dict(), f"{model_dir}/resnet18_cifar10.pt")
 
 
 if __name__ == "__main__":
