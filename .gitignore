@@ -18,3 +18,6 @@ results/
 .vscode/
 .idea/
 
+# CodeCarbon API Credentials
+.credentials.json
+
