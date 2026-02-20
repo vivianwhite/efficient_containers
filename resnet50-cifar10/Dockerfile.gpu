@@ -2,6 +2,7 @@
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
 # 2. Set working directory inside container
+RUN mkdir -p /app/resnet50-cifar10/{emissions,models}
 WORKDIR /app
 
 # System deps
