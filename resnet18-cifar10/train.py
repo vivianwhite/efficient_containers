@@ -7,7 +7,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torchvision.models import resnet18
-from codecarbon import track_emissions
+from codecarbon import track_emissions, EmissionsTracker
 
 
 def parse_args():
@@ -35,9 +35,12 @@ save_to_api = all([api_key, experiment_id])
         api_key=api_key,
         experiment_id=experiment_id,
         save_to_file=True,
-        log_level="WARNING",
-        output_dir="/app/resnet18-cifar10/emissions",
-        country_iso_code="CAN"
+        log_level="INFO",
+        output_dir=output_dir,
+        country_iso_code="CAN",
+        #region="british columbia",
+        tracking_mode='machine',
+        measure_power_secs=15,
         )
 def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
     start_time = time.time()
