@@ -24,7 +24,7 @@ def parse_args():
                         help="DataLoader worker processes")
     return parser.parse_args()
 
-output_dir = "/app/resnet18-cifar10/emissions"
+output_dir = "./emissions"
 os.makedirs(output_dir, exist_ok=True)
 
 api_key = os.environ.get("CODECARBON_API_TOKEN")
@@ -68,7 +68,7 @@ def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
     print(f"Training completed in {total_time:.2f} seconds")
 
 def main():
-    model_dir = "/app/resnet18-cifar10/models"
+    model_dir = "./models"
     os.makedirs(model_dir, exist_ok=True)
 
     args = parse_args()
