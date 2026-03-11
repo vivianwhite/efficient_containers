@@ -38,7 +38,7 @@ save_to_api = all([api_key, experiment_id])
         log_level="INFO",
         output_dir=output_dir,
         country_iso_code="CAN",
-        #region="british columbia",
+        region="british columbia",
         tracking_mode='machine',
         measure_power_secs=15,
         )
