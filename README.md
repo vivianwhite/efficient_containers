@@ -4,12 +4,17 @@ The repository consists of three reproducible, containerized ML experiments.
 
 ## Experiment 1: training ResNet18 on CIFAR10
 ### For Developers (Building from Source)
-#### Use this if you are modifying the Dockerfile or environment.
+#### Setup
+```
+git clone git@github.com:vivianwhite/efficient_containers.git
+cd efficient_containers
+```
+#### Use this if you are modifying the Dockerfile or environment for use on a GPU.
 ```
 git clone git@github.com:vivianwhite/efficient_containers.git
 cd efficient_containers
 
-### Build the GPU-optimized image
+### Build the GPU  image
 docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .`
 
 ### Run locally with volume mounting for instant code updates
@@ -19,11 +24,26 @@ docker run --rm --gpus all \
   vivwhite/ml-experiments:resnet18-cifar10-gpu \
   python3 train.py --batch-size 64 --epochs 1
 ```
+#### Use this if you are modifying the Dockerfile or environment for use on a CPU.
+```
+git clone git@github.com:vivianwhite/efficient_containers.git
+cd efficient_containers
+
+### Build the CPU  image
+docker build -f Dockerfile.cpu -t vivwhite/ml-experiments:resnet18-cifar10-cpu .
+
+### Run locally with volume mounting for instant code updates
+docker run --rm \
+  -v $(pwd):/app \
+  -w /app \
+  vivwhite/ml-experiments:resnet18-cifar10-cpu \
+  python3 train.py --batch-size 64 --epochs 1
+```
 
 ### For Users (Pulling the Pre-built Image)
-#### Use this to run experiments directly on the local GPU.
+#### Use this to run experiments directly on a local GPU.
 ```
-# Pull the latest image
+# Pull the GPU image
 docker pull vivwhite/ml-experiments:resnet18-cifar10-gpu
 # Run the training experiment
 # Note: Results (emissions.csv) will be saved to your current directory
@@ -31,5 +51,18 @@ docker run --rm --gpus all \
   -v $(pwd):/app \
   -w /app \
   vivwhite/ml-experiments:resnet18-cifar10-gpu \
+  python3 train.py --batch-size 64 --epochs 1
+```
+
+#### Use this to run experiments directly on a local CPU.
+```
+# Pull the CPU image
+docker pull vivwhite/ml-experiments:resnet18-cifar10-cpu
+
+# Run the training experiment (No --gpus flag needed)
+# Note: Results (emissions.csv) will be saved to your current directory
+docker run --rm \
+  -v $(pwd):/app -w /app \
+  vivwhite/ml-experiments:resnet18-cifar10-cpu \
   python3 train.py --batch-size 64 --epochs 1
 ```
