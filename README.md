@@ -1,6 +1,8 @@
 # efficient_containers
-A container-based toolkit for reusable, efficient, and energy-aware machine learning experiments
+A container-based toolkit for reusable, efficient, and energy-aware machine learning experiments.
+The repository consists of three reproducible, containerized ML experiments.
 
+## Experiment 1: training ResNet18 on CIFAR10
 ### For Developers (Building from Source)
 #### Use this if you are modifying the Dockerfile or environment.
 ```
