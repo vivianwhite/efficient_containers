@@ -53,6 +53,12 @@ docker run --rm --gpus all \
   vivwhite/ml-experiments:resnet18-cifar10-gpu \
   python3 train.py --batch-size 64 --epochs 1
 ```
+#### Use this to run Apptainer experiments directly on an HPC GPU.
+```
+# Run with --nv to enable NVIDIA GPU pass-through
+# Note: Results (emissions.csv) will be saved to your current directory
+apptainer run --nv resnet_gpu.sif --batch-size 64 --epochs 1
+```
 
 #### Use this to run experiments directly on a local CPU.
 ```
