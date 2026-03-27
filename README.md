@@ -11,9 +11,6 @@ cd efficient_containers
 ```
 #### Use this if you are modifying the Dockerfile or environment for use on a GPU.
 ```
-git clone git@github.com:vivianwhite/efficient_containers.git
-cd efficient_containers
-
 ### Build the GPU  image
 docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .`
 
@@ -21,14 +18,10 @@ docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .
 docker run --rm --gpus all \
   -v $(pwd):/app \
   -w /app \
-  vivwhite/ml-experiments:resnet18-cifar10-gpu \
-  python3 train.py --batch-size 64 --epochs 1
+  vivwhite/ml-experiments:resnet18-cifar10-gpu
 ```
 #### Use this if you are modifying the Dockerfile or environment for use on a CPU.
 ```
-git clone git@github.com:vivianwhite/efficient_containers.git
-cd efficient_containers
-
 ### Build the CPU  image
 docker build -f Dockerfile.cpu -t vivwhite/ml-experiments:resnet18-cifar10-cpu .
 
@@ -36,8 +29,7 @@ docker build -f Dockerfile.cpu -t vivwhite/ml-experiments:resnet18-cifar10-cpu .
 docker run --rm \
   -v $(pwd):/app \
   -w /app \
-  vivwhite/ml-experiments:resnet18-cifar10-cpu \
-  python3 train.py --batch-size 64 --epochs 1
+  vivwhite/ml-experiments:resnet18-cifar10-cpu
 ```
 
 ### For Users (Pulling the Pre-built Image)
@@ -50,8 +42,7 @@ docker pull vivwhite/ml-experiments:resnet18-cifar10-gpu
 docker run --rm --gpus all \
   -v $(pwd):/app \
   -w /app \
-  vivwhite/ml-experiments:resnet18-cifar10-gpu \
-  python3 train.py --batch-size 64 --epochs 1
+  vivwhite/ml-experiments:resnet18-cifar10-gpu
 ```
 #### Use this to run Apptainer experiments directly on an HPC GPU.
 ```
@@ -68,6 +59,42 @@ docker pull vivwhite/ml-experiments:resnet18-cifar10-cpu
 # Run the training experiment (No --gpus flag needed)
 # Note: Results (emissions.csv) will be saved to your current directory
 docker run --rm \
+  -v $(pwd):/app -w /app \
+  vivwhite/ml-experiments:resnet18-cifar10-cpu
+```
+
+
+## Experiment 2: finetuning Bert on GLUE SST2
+### For Developers (Building from Source)
+
+### Build the GPU  image
+docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-gpu .`
+
+### Run locally with volume mounting for instant code updates
+docker run --rm --gpus all \
+  -v $(pwd):/app \
+  -w /app \
+  -v hf_master_cache:/app/hf_cache \
+  -e HF_HOME=/app/hf_cache \
+  vivwhite/ml-experiments:bert-sst2-gpu
+```
+
+### For Users (Pulling the Pre-built Image)
+#### Use this to run experiments directly on a local GPU.
+```
+# Pull the GPU image
+docker pull vivwhite/ml-experiments:bert-sst2-gpu
+# Run the training experiment
+# Note: Results (emissions.csv) will be saved to your current directory
+docker run --rm --gpus all \
+  -v $(pwd):/app \
+  -w /app \
+  -v hf_master_cache: /app/hf_cache
+  -e HF_HOME=/workspace/hf_cache
+  vivwhite/ml-experiments:bert-sst2-gpu
+```
+
+
   -v $(pwd):/app -w /app \
   vivwhite/ml-experiments:resnet18-cifar10-cpu \
   python3 train.py --batch-size 64 --epochs 1
