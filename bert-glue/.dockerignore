@@ -1,0 +1,11 @@
+# Folders to ignore
+hf_cache/
+emissions/
+data/
+venv/
+.git/
+
+# Files to ignore
+*.pth
+*.bin
+*.csv
