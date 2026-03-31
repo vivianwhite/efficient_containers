@@ -12,7 +12,7 @@ cd efficient_containers
 #### Use this if you are modifying the Dockerfile or environment for use on a GPU.
 ```
 ### Build the GPU  image
-docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .`
+docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .
 
 ### Run locally with volume mounting for instant code updates
 docker run --rm --gpus all \
@@ -30,6 +30,16 @@ docker run --rm \
   -v $(pwd):/app \
   -w /app \
   vivwhite/ml-experiments:resnet18-cifar10-cpu
+```
+#### Use this if you are building a SIF file to run Apptainer on an HPC.
+```
+# 1. Set scratch paths to avoid 'No space left' errors during build
+export APPTAINER_TMPDIR=$SCRATCH/app_tmp
+export APPTAINER_CACHEDIR=$SCRATCH/app_cache
+mkdir -p $APPTAINER_TMPDIR $APPTAINER_CACHEDIR
+
+# 2. Build the SIF (Singularity Image File) from Docker Hub
+apptainer build resnet_gpu.sif docker://vivwhite/ml-experiments:resnet18-cifar10-gpu
 ```
 
 ### For Users (Pulling the Pre-built Image)
@@ -66,9 +76,9 @@ docker run --rm \
 
 ## Experiment 2: finetuning Bert on GLUE SST2
 ### For Developers (Building from Source)
-
+```
 ### Build the GPU  image
-docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-gpu .`
+docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-gpu .
 
 ### Run locally with volume mounting for instant code updates
 docker run --rm --gpus all \
@@ -92,10 +102,4 @@ docker run --rm --gpus all \
   -v hf_master_cache: /app/hf_cache
   -e HF_HOME=/workspace/hf_cache
   vivwhite/ml-experiments:bert-sst2-gpu
-```
-
-
-  -v $(pwd):/app -w /app \
-  vivwhite/ml-experiments:resnet18-cifar10-cpu \
-  python3 train.py --batch-size 64 --epochs 1
 ```
