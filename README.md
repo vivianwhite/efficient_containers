@@ -99,7 +99,20 @@ docker pull vivwhite/ml-experiments:bert-sst2-gpu
 docker run --rm --gpus all \
   -v $(pwd):/app \
   -w /app \
-  -v hf_master_cache: /app/hf_cache
-  -e HF_HOME=/workspace/hf_cache
+  -v hf_master_cache:/app/hf_cache
+  -e HF_HOME=/apphf_cache
   vivwhite/ml-experiments:bert-sst2-gpu
+```
+#### Use this to run experiments directly on a local CPU.
+```
+# Pull the GPU image
+docker pull vivwhite/ml-experiments:bert-sst2-gpu
+# Run the training experiment
+# Note: Results (emissions.csv) will be saved to your current directory
+docker run --rm \
+  -v $(pwd):/app \
+  -w /app \
+  -v hf_master_cache:/app/hf_cache
+  -e HF_HOME=/apphf_cache
+  vivwhite/ml-experiments:bert-sst2-cpu
 ```
