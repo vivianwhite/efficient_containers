@@ -1,0 +1,25 @@
+# Base image: slim Python
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+ENV HF_HOME=/app/hf_cache
+
+# Install CPU/system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    git-lfs \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Install shared requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Entry point
+ENTRYPOINT ["python", "train.py"]
