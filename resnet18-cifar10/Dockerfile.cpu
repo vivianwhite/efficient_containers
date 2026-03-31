@@ -1,23 +1,22 @@
-# 1. Base image: Python + Linux
+# Base image: slim Python
 FROM python:3.11-slim
 
-# 2. Set working directory inside container
-RUN mkdir -p /app/resnet50-cifar10/{emissions,models}
+# Set working directory
 WORKDIR /app
 
-# 3. Install CPU dependencies
+# Install CPU dependencies
 RUN pip install --upgrade pip
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
-RUN pip install --no-cache-dir torch==2.2.2+cpu torchvision==0.17.2+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+#RUN pip install --no-cache-dir torch torchvision
+#RUN pip install --no-cache-dir torch==2.2.2+cpu torchvision==0.17.2+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 
-# 4. Install shared deps
+# Install shared dependencies
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Copy the rest of the experiment code
+# Copy the rest of the experiment code
 COPY . .
 
-# 6. Default command to run the experiment
 ENTRYPOINT ["python", "train.py"]
 

@@ -1,27 +1,21 @@
-# 1. Base image: NVIDIA cuda
-FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+# Base image: PyTorch + CUDA
+FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
 
-# 2. Set working directory inside container
-RUN mkdir -p /app/resnet50-cifar10/{emissions,models}
+# Set working directory inside container
 WORKDIR /app
 
-# System deps
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
+# Install GPU dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    git-lfs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cu121
-
-# 3. Copy dependency list first (for caching)
+# Install shared dependencies
 COPY requirements.txt .
-
-# 4. Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Copy the rest of the experiment code
 COPY . .
 
-# 6. Default command to run the experiment
-ENTRYPOINT ["python3", "train.py"]
+ENTRYPOINT ["python", "train.py"]
 
