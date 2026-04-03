@@ -1,9 +1,15 @@
 # Use a lightweight PyTorch image with CUDA support
-FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+# FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+
+# Use a CUDA 12.8 image for Blackwell GPU
+FROM pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel
 
 # Set working directory
 WORKDIR /app
 ENV HF_HOME=/app/hf_cache
+
+# Ensure compatability with different architectures
+ENV TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6 8.9 9.0 12.0+PTX"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
