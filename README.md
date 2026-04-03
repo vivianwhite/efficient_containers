@@ -76,8 +76,8 @@ docker run --rm \
 docker run --rm --gpus all \
   -v $(pwd):/app \
   -w /app \
-  -v hf_master_cache:/app/hf_cache
-  -e HF_HOME=/app/hf_cache
+  -v hf_master_cache:/app/hf_cache \
+  -e HF_HOME=/app/hf_cache \
   vivwhite/ml-experiments:bert-sst2-gpu
 ```
 ##### Run the experiment on a CPU:
@@ -86,7 +86,7 @@ docker pull vivwhite/ml-experiments:bert-sst2-cpu
 docker run --rm \
   -v $(pwd):/app \
   -w /app \
-  -v hf_master_cache:/app/hf_cache
-  -e HF_HOME=/app/hf_cache
+  -v hf_master_cache:/app/hf_cache \
+  -e HF_HOME=/app/hf_cache \
   vivwhite/ml-experiments:bert-sst2-cpu
 ```
