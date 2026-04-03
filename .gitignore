@@ -1,24 +1,9 @@
-# Python virtual environment
-.venv/
+*.sif
+*.png
+*.log
+*.pdf
+*.jpg
 
-# Python cache
-__pycache__/
-*.py[cod]
-
-# Data and outputs
+emissions/
+models/
 data/
-outputs/
-results/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Editor / OS
-.DS_Store
-.vscode/
-.idea/
-
-# CodeCarbon
-credentials.json
-.codecarbon.config
-
