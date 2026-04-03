@@ -1,0 +1,4 @@
+*.sif
+emissions/
+models/
+data/
