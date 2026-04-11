@@ -14,6 +14,6 @@ export APPTAINER_CACHEDIR=$SCRATCH/app_cache
 mkdir -p $APPTAINER_TMPDIR $APPTAINER_CACHEDIR
 
 # run the build
-apptainer build resnet_gpu.sif docker://vivwhite/ml-experiments:resnet18-cifar10-gpu
+apptainer build bert_gpu.sif docker://vivwhite/ml-experiments:bert-sst2-gpu
 
 exit
