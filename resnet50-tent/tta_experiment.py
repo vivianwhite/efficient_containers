@@ -60,17 +60,18 @@ save_to_api = all([api_key, experiment_id])
         )
 def adapt(model, loader, corruption, device):
     correct, total = 0, 0
-    for batch in tqdm(loader):
-        labels = batch["label"].to(device)
-        inputs = batch["image"].to(device)
+    model.eval()
+    for inputs, labels in tqdm(loader, desc=f"Adapting to {corruption}"):
+        inputs, labels = inputs.to(device), labels.to(device)
+        with torch.no_grad():
+            outputs = model(inputs)
+            preds = outputs.argmax(dim=1)
 
-        outputs = model(inputs)
-        preds = outputs.argmax(dim=1)
-
-        correct += (preds == labels).float().mean()
+        correct += (preds == labels).sum().item()
         total += labels.size(0)
     acc = correct / total
     print(f"Accuracy on {corruption}: {acc:.4f}")
+    return acc
 
 def main():	
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
