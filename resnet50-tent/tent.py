@@ -106,8 +106,6 @@ def configure_model(model):
             m.track_running_stats = False
             m.running_mean = None
             m.running_var = None
-        if isinstance(m, (nn.GroupNorm, nn.LayerNorm)):
-            m.requires_grad_(True)
     return model
 
 
