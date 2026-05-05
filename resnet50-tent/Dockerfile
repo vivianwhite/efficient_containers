@@ -20,11 +20,9 @@ RUN pip3 install --no-cache-dir \
     --break-system-packages
 
 # Install specific TTA libraries
-RUN pip3 install --no-cache-dir timm scipy pandas matplotlib \
+RUN pip3 install --no-cache-dir timm scipy pandas matplotlib robustbench codecarbon numpy \
     --break-system-packages
-
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt --break-system-packages
+RUN pip3 install --no-cache-dir git+https://github.com/fra31/auto-attack.git --break-system-packages
 
 COPY . .
 

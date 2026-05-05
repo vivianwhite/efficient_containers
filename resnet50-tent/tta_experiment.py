@@ -11,7 +11,7 @@ import tent
 from torch.utils.data import DataLoader, TensorDataset
 from torchvision import datasets, transforms
 from codecarbon import track_emissions
-from robustbench.data import load_imagenet_c
+from robustbench.data import load_imagenetc
 
 def imagenet_collate_fn(batch):
     images, labels = zip(*batch)
@@ -120,7 +120,7 @@ def main():
         #    collate_fn=imagenet_collate_fn)
         #model = timm.create_model('resnet50', pretrained=True)
         #categories = model.pretrained_cfg.get('label_names', [])
-        x_test, y_test = load_imagenet_c(
+        x_test, y_test = load_imagenetc(
             n_examples=5000,
             severity=args.level,
             data_dir='/app/data/',
