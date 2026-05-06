@@ -1,5 +1,5 @@
-## Experiment 2: finetuning Bert on GLUE SST2
-`cd bert-glue`
+## Finetuning Bert on GLUE SST2
+
 ### For Developers (Building from Source)
 ##### Modify the Dockerfile or environment for use on a GPU:
 `docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-gpu .`
