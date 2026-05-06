@@ -1,6 +1,5 @@
 
 ## Training ResNet18 on CIFAR10
-`cd resnet18-cifar10 `
 ### For Developers (Building from Source)
 ##### Modify the Dockerfile or environment for use on a GPU:
 `docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .`
