@@ -1,108 +1,26 @@
 # efficient_containers
 A container-based toolkit for reusable, efficient, and energy-aware machine learning experiments.
-The repository consists of three reproducible, containerized ML experiments.
+The repository provides three reproducible, containerized ML experiments: training ResNet18 on CIFAR10, finetuning Bert on GLUE SST2, and adapting ResNet50 to ImageNet-C.
 
-#### Setup
+Docker is a system for consolidating everything needed for an environment into an “image”. Images are reproducible and can be pushed and pulled from the Docker hub. This enables consistency across machines and portability: images can be pulled from the Docker Hub and run on local workstations or HPC clusters (via Apptainer).
+
+We integrate CodeCarbon to monitor the environmental impact of these experiments. CodeCarbon measures CPU, GPU, and RAM power consumption, total energy usage (kWh), and hardware utilization. CodeCarbon can store data locally or on the cloud:
+* Local: energy metrics are saved automatically to `emissions/emissions.csv` within each experiment folder.
+* Cloud (Optional): If you ahveg a CodeCarbon account, provide your `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` as environment variables to sync data to your web dashboard.
+
+
+
+### Structure
+Each experiment folder contains its own `Dockerfile`, source code, and a `README.md` with instructions for running and developing the code.
+* `resnet18-cifar10/` trains a ResNet18 from scratch on CIFAR-10 dataset
+* `bert-glue/` fine-tunes BERT-Base on the GLUE (SST2) task.
+* `resnet50-tent/` adapts a ResNet50 using Tent to ImageNet-C at test-time.
+  
+Each experiment folder also comes with plotting code to visualize the energy emissions.
+
+### Setup
 ```
 git clone git@github.com:vivianwhite/efficient_containers.git
 cd efficient_containers
 ```
-
-## Experiment 1: training ResNet18 on CIFAR10
-`cd resnet18-cifar10 `
-### For Developers (Building from Source)
-##### Modify the Dockerfile or environment for use on a GPU:
-`docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .`
-
-##### Modify the Dockerfile or environment for use on a CPU:
-`docker build -f Dockerfile.cpu -t vivwhite/ml-experiments:resnet18-cifar10-cpu .`
-
-##### Build a SIF file to run Apptainer on an HPC:
-```
-# 1. Set scratch paths to avoid 'No space left' errors during build
-export APPTAINER_TMPDIR=$SCRATCH/app_tmp
-export APPTAINER_CACHEDIR=$SCRATCH/app_cache
-mkdir -p $APPTAINER_TMPDIR $APPTAINER_CACHEDIR
-
-# 2. Build the SIF (Singularity Image File) from Docker Hub
-apptainer build resnet_gpu.sif docker://vivwhite/ml-experiments:resnet18-cifar10-gpu
-```
-
-### For Users (Pulling the Pre-built Image)
-##### Pull the GPU image:
-`docker pull vivwhite/ml-experiments:resnet18-cifar10-gpu`
-
-##### Pull the CPU image:
-`docker pull vivwhite/ml-experiments:resnet18-cifar10-cpu`
-
-### Running the experiment
-##### Run the experiment on a GPU:
-```
-docker run --rm --gpus all \
-  -v $(pwd):/app \
-  -w /app \
-  vivwhite/ml-experiments:resnet18-cifar10-gpu
-```
-##### Run the experiment on a HPC GPU with Apptainer:
-```
-apptainer run --nv resnet_gpu.sif --batch-size 64 --epochs 1
-```
-
-##### Run the experiment on a CPU:
-```
-docker run --rm \
-  -v $(pwd):/app -w /app \
-  vivwhite/ml-experiments:resnet18-cifar10-cpu
-```
-
-
-## Experiment 2: finetuning Bert on GLUE SST2
-`cd bert-glue`
-### For Developers (Building from Source)
-##### Modify the Dockerfile or environment for use on a GPU:
-`docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-gpu .`
-##### Modify the Dockerfile or environment for use on a CPU:
-`docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-cpu .`
-
-##### Build a SIF file to run Apptainer on an HPC:
-```
-# 1. Set scratch paths to avoid 'No space left' errors during build
-export APPTAINER_TMPDIR=$SCRATCH/app_tmp
-export APPTAINER_CACHEDIR=$SCRATCH/app_cache
-mkdir -p $APPTAINER_TMPDIR $APPTAINER_CACHEDIR
-mkdir -p $SCRATCH/hf_master_cache
-
-# 2. Build the SIF (Singularity Image File) from Docker Hub
-apptainer build bert_gpu.sif docker://vivwhite/ml-experiments:bert-sst2-gpu
-```
-
-### For Users (Pulling the Pre-built Image)
-##### Pull the GPU image:
-`docker pull vivwhite/ml-experiments:bert-sst2-gpu`
-##### Pull the CPU image:
-`docker pull vivwhite/ml-experiments:bert-sst2-cpu`
-
-### Running the experiment
-##### Run the experiment on a GPU:
-```
-docker run --rm --gpus all \
-  -v $(pwd):/app \
-  -w /app \
-  -v hf_master_cache:/app/hf_cache \
-  -e HF_HOME=/app/hf_cache \
-  vivwhite/ml-experiments:bert-sst2-gpu
-```
-##### Run the experiment on a HPC GPU with Apptainer:
-```
-apptainer run --nv  -bind $SCRATCH/hf_master_cache:/app/hf_cache bert_gpu.sif 
-```
-##### Run the experiment on a CPU:
-```
-docker pull vivwhite/ml-experiments:bert-sst2-cpu
-docker run --rm \
-  -v $(pwd):/app \
-  -w /app \
-  -v hf_master_cache:/app/hf_cache \
-  -e HF_HOME=/app/hf_cache \
-  vivwhite/ml-experiments:bert-sst2-cpu
-```
+Navigate to any experiment folder and follow the local `README.md`.
