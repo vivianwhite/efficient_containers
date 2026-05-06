@@ -11,7 +11,7 @@ import tent
 from tqdm import tqdm
 from torch.utils.data import DataLoader, TensorDataset
 from torchvision import datasets, transforms
-from codecarbon import track_emissions
+from codecarbon import EmissionsTracker
 from robustbench.data import load_imagenetc
 
 def imagenet_collate_fn(batch):
@@ -29,25 +29,7 @@ def parse_args():
                         help="episodic resets model and optimizer after each corruption")
     return parser.parse_args()
 
-args = parse_args()
-output_dir = "./emissions"
-os.makedirs(output_dir, exist_ok=True)
 
-api_key = os.environ.get("CODECARBON_API_TOKEN")
-experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
-save_to_api = all([api_key, experiment_id])
-@track_emissions(
-        save_to_api=save_to_api,
-        api_key=api_key,
-        experiment_id=experiment_id,
-        save_to_file=True,
-        log_level="ERROR",
-        output_dir=output_dir,
-        country_iso_code="CAN",
-        region="british columbia",
-        tracking_mode='machine',
-        measure_power_secs=15,
-        )
 def adapt(model, loader, corruption, device):
     correct, total = 0, 0
     model.eval()
@@ -65,11 +47,19 @@ def adapt(model, loader, corruption, device):
 
 def main():	
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    args = parse_args()
+    emissions_dir = "./emissions"
+    os.makedirs(emissions_dir, exist_ok=True)
+    api_key = os.environ.get("CODECARBON_API_TOKEN")
+    experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
+    save_to_api = all([api_key, experiment_id])
+    results_dir = "./results"
+    os.makedirs(results_dir, exist_ok=True)
     print(f"Using device: {device}")
+
     lr = (0.00025 / 64) * args.batch_size * 2 if args.batch_size < 32 else 0.00025
 
-    corruptions = 
-      [
+    corruptions = [
          'gaussian_noise', 'shot_noise', 'impulse_noise','defocus_blur',
          'glass_blur', 'motion_blur', 'zoom_blur', 'snow', 'frost', 'fog',
          'brightness', 'contrast', 'elastic_transform', 'pixelate',
@@ -86,9 +76,20 @@ def main():
     with open(results, mode='a', newline='') as f:
         writer = csv.writer(f)
         if not os.path.isfile(results):
-            writer.writerow(["corruption", "severity", "accuracy", "batch_size", "lr"])
+            writer.writerow(["corruption", "severity", "accuracy", "kwh", "batch_size", "lr"])
 
     for corrupt in corruptions:
+        tracker = EmissionsTracker(
+            project_name=f"tent_{corrupt}_lvl{args.level}",
+            output_dir=emissions_dir,
+            save_to_api=save_to_api,
+            api_key=api_key,
+            experiment_id=experiment_id,
+            tracking_mode="machine",
+            measure_power_secs=5,
+            log_level="ERROR"
+        )
+        tracker.start()
         print(f"--- Adapting to {corrupt} ---")
         optimizer = torch.optim.Adam(params,lr=lr)
         tented_model = tent.Tent(model, optimizer)
@@ -104,8 +105,12 @@ def main():
         loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
         acc = adapt(tented_model, loader, corrupt, device)
-        writer.writerow([corrupt, args.level, f"{acc:.4f}", args.batch_size, lr])
-        f.flush()
+        emissions_kwh = tracker.stop()
+        print(f"{emissions_kwh:.6f} kwh")
+        with open(results, mode='a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([corrupt, args.level, f"{acc:.4f}", emissions_kwh, args.batch_size, lr])
+            f.flush()
         print(f"Saved {corrupt} results to {results}")
 
         if args.method == 'episodic':
