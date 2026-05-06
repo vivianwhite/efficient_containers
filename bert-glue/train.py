@@ -4,24 +4,16 @@ import os
 import time
 import tqdm
 import functools
+import csv
 import torch.nn as nn
 import torch.optim as optim
 from datasets import load_dataset
 from transformers import BertForSequenceClassification, AutoTokenizer, DataCollatorWithPadding
-from codecarbon import track_emissions
+from codecarbon import EmissionsTracker
 
-dataset = load_dataset("glue", "sst2")
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
-def tokenize_function(examples):
+def tokenize_function(examples, tokenizer):
     return tokenizer(examples["sentence"], truncation=True, max_length=128)
-all_cols = dataset["train"].column_names
-remove_cols = [col for col in all_cols if col not in ['label', 'labels']]
-tokenized_datasets = dataset.map(
-        tokenize_function, 
-        batched=True,
-        remove_columns=remove_cols
-        )
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -33,27 +25,6 @@ def parse_args():
                         help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=2e-5)
     return parser.parse_args()
-
-args = parse_args()
-
-output_dir = "./emissions"
-os.makedirs(output_dir, exist_ok=True)
-
-api_key = os.environ.get("CODECARBON_API_TOKEN")
-experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
-save_to_api = all([api_key, experiment_id])
-@track_emissions(
-        save_to_api=save_to_api,
-        api_key=api_key,
-        experiment_id=experiment_id,
-        save_to_file=True,
-        log_level="INFO",
-        output_dir=output_dir,
-        country_iso_code="CAN",
-        region="british columbia",
-        tracking_mode='machine',
-        measure_power_secs=15,
-        )
 
 def train(model, train_loader, val_loader, optimizer, epochs, device):
     start_time = time.time()
@@ -77,7 +48,8 @@ def train(model, train_loader, val_loader, optimizer, epochs, device):
 
                 # update progress bar
                 pbar.set_postfix(loss=float(loss))
-        validate(model, val_loader, device)
+        acc = validate(model, val_loader, device)
+    return acc
 
 def validate(model, val_loader, device):
     model.eval()
@@ -89,30 +61,81 @@ def validate(model, val_loader, device):
             predictions = outputs.logits.argmax(dim=-1)
             num_matches += (predictions == batch["labels"]).sum().item()
             num_samples += len(batch["labels"])
-    print(f"Accuracy: {num_matches / num_samples:.4f}")
+    acc = num_matches / num_samples
+    print(f"Accuracy: {acc:.4f}")
+    return acc
+    
+def main():
+    args = parse_args()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    dataset = load_dataset("glue", "sst2")
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+    emissions_dir = "./emissions"
+    os.makedirs(emissions_dir, exist_ok=True)
+    model_dir = "./models"
+    os.makedirs(model_dir, exist_ok=True)
+    results_dir = "./results"
+    os.makedirs(results_dir, exist_ok=True)
+
+    api_key = os.environ.get("CODECARBON_API_TOKEN")
+    experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
+    save_to_api = all([api_key, experiment_id])
+
+    model = BertForSequenceClassification.from_pretrained("bert-base-uncased",num_labels=2).to(device)
+    optimizer = optim.AdamW(model.parameters(), lr=args.lr)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = BertForSequenceClassification.from_pretrained("bert-base-uncased",num_labels=2).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=args.lr)
-data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
-
-train_loader = torch.utils.data.DataLoader(
+    all_cols = dataset["train"].column_names
+    remove_cols = [col for col in all_cols if col not in ['label', 'labels']]
+    tokenized_datasets = dataset.map(
+        tokenize_function, 
+        batched=True,
+        remove_columns=remove_cols,
+        fn_kwargs={"tokenizer":tokenizer}
+    )
+    train_loader = torch.utils.data.DataLoader(
         tokenized_datasets["train"], 
         batch_size=args.batch_size,
         shuffle=True, 
         collate_fn=data_collator
-)
-val_loader = torch.utils.data.DataLoader(
+    )
+    val_loader = torch.utils.data.DataLoader(
         tokenized_datasets["validation"], 
         batch_size=args.batch_size,
         shuffle=False, 
         collate_fn=data_collator
-)
+    )
+    results = "results/results.csv"
+    file_exists = os.path.isfile(results)
 
-model_dir = "./models"
-os.makedirs(model_dir, exist_ok=True)
-train(model, train_loader, val_loader, optimizer, args.epochs, device)
-model.save_pretrained(model_dir)
-tokenizer.save_pretrained(model_dir)
+    with open(results, mode='a', newline='') as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["accuracy", "kwh", "batch_size", "lr", "epochs"])
+
+    tracker = EmissionsTracker(
+            project_name=f"bert-glue-sst2",
+            output_dir=emissions_dir,
+            save_to_api=save_to_api,
+            api_key=api_key,
+            experiment_id=experiment_id,
+            tracking_mode="machine",
+            measure_power_secs=5,
+            log_level="ERROR"
+        )
+    tracker.start()
+    acc = train(model, train_loader, val_loader, optimizer, args.epochs, device)
+    emissions_kwh = tracker.stop()
+    print(f"{emissions_kwh:.6f} kwh")
+    with open(results, mode='a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([f"{acc:.4f}", emissions_kwh, args.batch_size, args.lr, args.epochs])
+        f.flush()
+
+    model.save_pretrained(model_dir)
+    tokenizer.save_pretrained(model_dir)
+
+if __name__ == "__main__":
+    main()
