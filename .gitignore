@@ -3,6 +3,7 @@
 *.log
 *.pdf
 *.jpg
+*.pyc
 
 emissions/
 models/
