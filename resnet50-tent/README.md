@@ -30,7 +30,7 @@ docker run --rm --gpus all \
 ```
 ##### Run the experiment on a HPC GPU with Apptainer:
 ```
-apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C resnet_tent.sif
+apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C resnet50_tent.sif
 ```
 ### Results
 Energy emissions are logged to `emissions/emissions.csv`.
