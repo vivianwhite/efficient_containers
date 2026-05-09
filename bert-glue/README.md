@@ -34,7 +34,7 @@ docker run --rm --gpus all \
 ```
 apptainer run --nv  --bind $SCRATCH/hf_master_cache:/app/hf_cache bert_glue.sif 
 ```
-#####_Optional: log emissions to CodeCarbon API_
+##### _Optional: log emissions to CodeCarbon API_
 First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key.
 
 `apptainer run --nv --env CODECARBON_API_TOKEN=X --env CODECARBON_EXPERIMENT_ID=Y --bind $SCRATCH/hf_master_cache:/app/hf_cache bert_glue bert_glue.sif`
