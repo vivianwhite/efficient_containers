@@ -6,7 +6,8 @@ Docker is a system for consolidating everything needed for an environment into a
 
 We integrate CodeCarbon to monitor the environmental impact of these experiments. CodeCarbon measures CPU, GPU, and RAM power consumption, total energy usage (kWh), and hardware utilization. CodeCarbon can store data locally or on the cloud:
 * Local: energy metrics are saved automatically to `emissions/emissions.csv` within each experiment folder.
-* Cloud (Optional): If you have a CodeCarbon account, provide your `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` as environment variables to sync data to your web dashboard.
+* Cloud (Optional): provide your `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` as environment variables to sync data to your web dashboard.
+  * you must log into CodeCarbon, create a project, create an experiment within the project, and generate an API key.
 
 
 
@@ -16,7 +17,7 @@ Each experiment folder contains its own `Dockerfile`, source code, and a `README
 * `bert-glue/` fine-tunes BERT-Base on the GLUE (SST2) task.
 * `resnet50-tent/` adapts a ResNet50 using Tent to ImageNet-C at test-time.
   
-Each experiment folder also comes with plotting code to visualize the energy emissions.
+Each experiment folder additionally contains a `plot.py` script to visualize the energy emissions.
 
 ### Setup
 ```
