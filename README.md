@@ -6,7 +6,7 @@ Docker is a system for consolidating everything needed for an environment into a
 
 We integrate CodeCarbon to monitor the environmental impact of these experiments. CodeCarbon measures CPU, GPU, and RAM power consumption, total energy usage (kWh), and hardware utilization. CodeCarbon can store data locally or on the cloud:
 * Local: energy metrics are saved automatically to `emissions/emissions.csv` within each experiment folder.
-* Cloud (Optional): If you ahveg a CodeCarbon account, provide your `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` as environment variables to sync data to your web dashboard.
+* Cloud (Optional): If you have a CodeCarbon account, provide your `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` as environment variables to sync data to your web dashboard.
 
 
 
