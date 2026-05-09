@@ -3,11 +3,38 @@
 * `--batch_size`, default=32
 * `--epochs`, default=3
 * `--lr`, default=2e-5
-### For Developers (Building from Source)
-##### Modify the Dockerfile or environment for use on a GPU:
+### To build (for developers)
+#### Modify the Dockerfile or environment:
 `docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-glue .`
 
-##### Build a SIF file to run Apptainer on an HPC:
+
+
+### To run (for users)
+#### Pull the pre-built image:
+`docker pull vivwhite/ml-experiments:bert-sst2-glue`
+
+#### Run the experiment on a GPU:
+```
+docker run --rm --gpus all \
+  -v $(pwd):/app \
+  -w /app \
+  -v hf_master_cache:/app/hf_cache \
+  -e HF_HOME=/app/hf_cache \
+  vivwhite/ml-experiments:bert-sst2-glue
+```
+_Optional: log emissions to CodeCarbon API_
+```
+docker run --rm --gpus all \
+  -v $(pwd):/app \
+  -w /app \
+  -v hf_master_cache:/app/hf_cache \
+  -e HF_HOME=/app/hf_cache \
+  -e CODECARBON_API_TOKEN=X \
+  -e CODECARBON_EXPERIMENT_ID=Y \
+  vivwhite/ml-experiments:bert-sst2-glue
+```
+#### Run the experiment on a HPC GPU with Apptainer:
+First, build a SIF file to run Apptainer on an HPC:
 ```
 # 1. Set scratch paths to avoid 'No space left' errors during build
 export APPTAINER_TMPDIR=$SCRATCH/app_tmp
@@ -18,27 +45,11 @@ mkdir -p $SCRATCH/hf_master_cache
 # 2. Build the SIF (Singularity Image File) from Docker Hub
 apptainer build bert_glue.sif docker://vivwhite/ml-experiments:bert-sst2-glue
 ```
-
-### For Users (Pulling the Pre-built Image)
-##### Pull the GPU image:
-`docker pull vivwhite/ml-experiments:bert-sst2-glue`
-
-### Running the experiment
-##### Run the experiment on a GPU:
-```
-docker run --rm --gpus all \
-  -v $(pwd):/app \
-  -w /app \
-  -v hf_master_cache:/app/hf_cache \
-  -e HF_HOME=/app/hf_cache \
-  vivwhite/ml-experiments:bert-sst2-glue
-```
-##### Run the experiment on a HPC GPU with Apptainer:
+Then run:
 ```
 apptainer run --nv  --bind $SCRATCH/hf_master_cache:/app/hf_cache bert_glue.sif 
 ```
-##### _Optional: log emissions to CodeCarbon API_
-First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key.
+_Optional: log emissions to CodeCarbon API_
 
 `apptainer run --nv --env CODECARBON_API_TOKEN=X --env CODECARBON_EXPERIMENT_ID=Y --bind $SCRATCH/hf_master_cache:/app/hf_cache bert_glue bert_glue.sif`
 
