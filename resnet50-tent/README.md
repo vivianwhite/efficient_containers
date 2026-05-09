@@ -42,3 +42,5 @@ CODECARBON_EXPERIMENT_ID=Y resnet50_tent.sif
 Energy emissions are logged to `emissions/emissions.csv`.
 Adaptation results are saved in `results/results.csv`.
 Adapted model weights saved in `models/`.
+<img width="640" height="480" alt="energy_consumed" src="https://github.com/user-attachments/assets/b1b12396-28cc-43e9-a37d-06645c2b4e7b" />
+
