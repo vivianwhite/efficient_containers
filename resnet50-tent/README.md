@@ -32,6 +32,12 @@ docker run --rm --gpus all \
 ```
 apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C resnet50_tent.sif
 ```
+##### _Optional: log emissions to CodeCarbon API_
+First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key.
+```
+apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C --env CODECARBON_API_TOKEN=X --env
+CODECARBON_EXPERIMENT_ID=Y resnet50_tent.sif 
+```
 ### Results
 Energy emissions are logged to `emissions/emissions.csv`.
 Adaptation results are saved in `results/results.csv`.
