@@ -1,5 +1,8 @@
 ## Finetuning Bert on GLUE SST2
-
+### Arguments
+* `--batch_size`, default=32
+* `--epochs`, default=3
+* `--lr`, default=2e-5
 ### For Developers (Building from Source)
 ##### Modify the Dockerfile or environment for use on a GPU:
 `docker build -f Dockerfile -t vivwhite/ml-experiments:bert-sst2-glue .`
