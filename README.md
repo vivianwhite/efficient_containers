@@ -21,7 +21,7 @@ Each experiment folder additionally contains a `plot.py` script to visualize the
 
 ### Setup
 ```
-git clone git@github.com:vivianwhite/efficient_containers.git
+git clone https://github.com/vivianwhite/efficient_containers.git
 cd efficient_containers
 ```
 Navigate to any experiment folder and follow the local `README.md`.
