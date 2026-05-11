@@ -8,7 +8,7 @@
 
 ### To build (for developers)
 ##### Modify the Dockerfile or environment for use on a GPU or CPU:
-`docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .`
+`docker build -f Dockerfile.gpu -t vivwhite/ml-experiments:resnet18-cifar10-gpu .` \
 `docker build -f Dockerfile.cpu -t vivwhite/ml-experiments:resnet18-cifar10-cpu .`
 
 
