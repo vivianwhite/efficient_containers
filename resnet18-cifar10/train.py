@@ -1,4 +1,5 @@
 import os
+import csv
 import time
 import argparse
 import torch
@@ -14,34 +15,16 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Train ResNet-18 on CIFAR-10"
     )
-    parser.add_argument("--batch-size", type=int, default=128,
+    parser.add_argument("--batch_size", type=int, default=128,
                         help="Batch size for training")
     parser.add_argument("--epochs", type=int, default=10,
                         help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.1,
                         help="Learning rate")
-    parser.add_argument("--num-workers", type=int, default=4,
+    parser.add_argument("--num_workers", type=int, default=4,
                         help="DataLoader worker processes")
     return parser.parse_args()
 
-output_dir = "./emissions"
-os.makedirs(output_dir, exist_ok=True)
-
-api_key = os.environ.get("CODECARBON_API_TOKEN")
-experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
-save_to_api = all([api_key, experiment_id])
-@track_emissions(
-        save_to_api=save_to_api,
-        api_key=api_key,
-        experiment_id=experiment_id,
-        save_to_file=True,
-        log_level="INFO",
-        output_dir=output_dir,
-        country_iso_code="CAN",
-        region="british columbia",
-        tracking_mode='machine',
-        measure_power_secs=15,
-        )
 def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
     start_time = time.time()
     for epoch in range(epochs):
@@ -66,11 +49,27 @@ def train(model, trainloader, criterion, optimizer, scheduler, epochs, device):
 
     total_time = time.time() - start_time
     print(f"Training completed in {total_time:.2f} seconds")
+    return avg_loss
 
 def main():
     model_dir = "./models"
     os.makedirs(model_dir, exist_ok=True)
 
+    emissions_dir = "./emissions"
+    os.makedirs(emissions_dir, exist_ok=True)
+
+    results_dir = "./results"
+    os.makedirs(results_dir, exist_ok=True)
+    results = f"results/resnet18.csv"
+    is_file = os.path.isfile(results)
+    with open(results, mode='a', newline='') as f:
+        writer = csv.writer(f)
+        if not is_file:
+            writer.writerow(["epochs", "accuracy", "kwh", "loss", "batch_size", "lr", "device"])
+
+    api_key = os.environ.get("CODECARBON_API_TOKEN")
+    experiment_id = os.environ.get("CODECARBON_EXPERIMENT_ID")
+    save_to_api = all([api_key, experiment_id])
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -114,8 +113,19 @@ def main():
     )
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
 
+    tracker = EmissionsTracker(
+            project_name=f"resnet18",
+            output_dir=emissions_dir,
+            save_to_api=save_to_api,
+            api_key=api_key,
+            experiment_id=experiment_id,
+            tracking_mode="machine",
+            measure_power_secs=5,
+            log_level="ERROR"
+        )
+    tracker.start()
     # Training
-    train(model, trainloader, criterion, optimizer, scheduler, args.epochs, device)
+    loss = train(model, trainloader, criterion, optimizer, scheduler, args.epochs, device)
 
     # Evaluation
     model.eval()
@@ -133,8 +143,17 @@ def main():
     acc = 100.0 * correct / total
     print(f"Test accuracy: {acc:.2f}%")
 
+    emissions_kwh = tracker.stop()
+    print(f"{emissions_kwh:.6f} kwh")
+    with open(results, mode='a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([args.epochs, f"{acc:.4f}", emissions_kwh, loss, args.batch_size, args.lr, device])
+        f.flush()
+    print(f"Saved results to {results}")
+
     # Save model
     torch.save(model.state_dict(), f"{model_dir}/resnet18_cifar10.pt")
+    print(f"Saved model to {model_dir}/resnet18_cifar10.pt")
 
 
 if __name__ == "__main__":
