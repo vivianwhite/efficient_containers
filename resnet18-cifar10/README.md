@@ -61,3 +61,6 @@ apptainer run --nv --env CODECARBON_API_TOKEN=X --env CODECARBON_EXPERIMENT_ID=Y
 Emissions are saved to `emissions/emissions.csv`. 
 Model is saved to `models/resnet18_cifar10.pt`.
 Results are saved to `results/results.csv`.
+The model gets 77.36% after 10 epochs and 86.62% after 50 epochs.
+<img width="640" height="480" alt="acc_energy_tradeoff" src="https://github.com/user-attachments/assets/8a79a4c5-3dec-4764-87ed-c6c080e0110d" />
+
