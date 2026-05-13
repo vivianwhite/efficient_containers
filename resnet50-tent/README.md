@@ -20,9 +20,9 @@ apptainer build resnet50_tent.sif docker://vivwhite/ml-experiments:resnet50-tent
 `docker pull vivwhite/ml-experiments:resnet50-tent`
 
 ### Running the experiment
-##### Run the experiment on a local GPU _(Untested)_
+##### Run the experiment on a local GPU
 ```
-docker run --rm --gpus all \
+docker run --rm --gpus all --ipc=host \
   -v $(pwd):/app \
   -w /app \
   -v /datasets/imagenet-c:/app/data/ImageNet-C \
