@@ -22,15 +22,15 @@ docker run --rm --gpus all \
   -e HF_HOME=/app/hf_cache \
   vivwhite/ml-experiments:bert-sst2-glue
 ```
-_Optional: log emissions to CodeCarbon API_
+##### _Optional: log emissions to CodeCarbon API_
+First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key.
+Add `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` to a `.env` file.
 ```
-docker run --rm --gpus all \
+docker run --rm --gpus all --env-file .env \
   -v $(pwd):/app \
   -w /app \
   -v hf_master_cache:/app/hf_cache \
   -e HF_HOME=/app/hf_cache \
-  -e CODECARBON_API_TOKEN=X \
-  -e CODECARBON_EXPERIMENT_ID=Y \
   vivwhite/ml-experiments:bert-sst2-glue
 ```
 #### Run the experiment on a HPC GPU with Apptainer:
