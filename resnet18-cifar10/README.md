@@ -34,7 +34,9 @@ docker run --rm \
  
 First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key. 
 
-Add environment variables to the run command: `-e CODECARBON_API_TOKEN=X -e CODECARBON_EXPERIMENT_ID=Y `.
+Add `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` to a `.env` file.
+
+Add `--env-file .env` to your run command.
 
 ##### Run the experiment on a HPC GPU with Apptainer:
 First, build a SIF file to run Apptainer on an HPC:
@@ -51,7 +53,7 @@ Then run:
 ```
 apptainer run --nv resnet_gpu.sif
 ```
- _Optional: log emissions to CodeCarbon API_
+##### _Optional: log emissions to CodeCarbon API_
 ```
 apptainer run --nv --env CODECARBON_API_TOKEN=X --env CODECARBON_EXPERIMENT_ID=Y resnet_gpu.sif
 ```
