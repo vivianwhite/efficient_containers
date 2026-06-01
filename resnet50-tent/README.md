@@ -20,9 +20,19 @@ apptainer build resnet50_tent.sif docker://vivwhite/ml-experiments:resnet50-tent
 `docker pull vivwhite/ml-experiments:resnet50-tent`
 
 ### Running the experiment
-##### Run the experiment on a local GPU
+##### Run the experiment on a local GPU:
 ```
 docker run --rm --gpus all --ipc=host \
+  -v $(pwd):/app \
+  -w /app \
+  -v /datasets/imagenet-c:/app/data/ImageNet-C \
+  vivwhite/ml-experiments:resnet50-tent
+```
+##### _Optional: log emissions to CodeCarbon API_
+First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key.
+Add `CODECARBON_API_TOKEN` and `CODECARBON_EXPERIMENT_ID` to a `.env` file.
+```
+docker run --rm --gpus all --ipc=host --env_file .env \
   -v $(pwd):/app \
   -w /app \
   -v /datasets/imagenet-c:/app/data/ImageNet-C \
@@ -33,7 +43,6 @@ docker run --rm --gpus all --ipc=host \
 apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C resnet50_tent.sif
 ```
 ##### _Optional: log emissions to CodeCarbon API_
-First log into CodeCarbon, then create a project, then create an experiment within the project and generate an API key.
 ```
 apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C --env CODECARBON_API_TOKEN=X --env
 CODECARBON_EXPERIMENT_ID=Y resnet50_tent.sif 
