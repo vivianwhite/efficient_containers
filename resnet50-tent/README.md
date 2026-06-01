@@ -1,19 +1,12 @@
 ## Adapting ResNet50 with Tent
+### Arguments
+* `--batch_size`, default=32
+* `--level`, default=5 (ImageNet-C corruption severity level)
+* `--method`, default='episodic' (Continual or episodic adaptation)
 
 ### For Developers (Building from Source)
 ##### Modify the Dockerfile or environment for use on a GPU:
 `docker build -f Dockerfile -t vivwhite/ml-experiments:resnet50-tent .`
-
-##### Build a SIF file to run Apptainer on an HPC:
-```
-# 1. Set scratch paths to avoid 'No space left' errors during build
-export APPTAINER_TMPDIR=$SCRATCH/app_tmp
-export APPTAINER_CACHEDIR=$SCRATCH/app_cache
-mkdir -p $APPTAINER_TMPDIR $APPTAINER_CACHEDIR
-
-# 2. Build the SIF (Singularity Image File) from Docker Hub
-apptainer build resnet50_tent.sif docker://vivwhite/ml-experiments:resnet50-tent
-```
 
 ### For Users (Pulling the Pre-built Image)
 ##### Pull the GPU image:
@@ -39,6 +32,17 @@ docker run --rm --gpus all --ipc=host --env_file .env \
   vivwhite/ml-experiments:resnet50-tent
 ```
 ##### Run the experiment on a HPC GPU with Apptainer:
+First, build a SIF file to run Apptainer on an HPC:
+```
+# 1. Set scratch paths to avoid 'No space left' errors during build
+export APPTAINER_TMPDIR=$SCRATCH/app_tmp
+export APPTAINER_CACHEDIR=$SCRATCH/app_cache
+mkdir -p $APPTAINER_TMPDIR $APPTAINER_CACHEDIR
+
+# 2. Build the SIF (Singularity Image File) from Docker Hub
+apptainer build resnet50_tent.sif docker://vivwhite/ml-experiments:resnet50-tent
+```
+Then run:
 ```
 apptainer run --nv --bind /datasets/imagenet-c:/app/data/ImageNet-C resnet50_tent.sif
 ```
