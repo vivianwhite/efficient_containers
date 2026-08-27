@@ -1,4 +1,4 @@
-# Efficiency of Computational Experiments
+# Containers for Measuring Efficiency of Computational Experiments
 A container-based toolkit for reusable, efficient, and energy-aware machine learning experiments.
 The repository provides three reproducible, containerized ML experiments: training ResNet18 on CIFAR10, finetuning Bert on GLUE SST2, and adapting ResNet50 to ImageNet-C.
 
